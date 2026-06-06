@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>PHC Kareli Badi - Mess Management</title>
-  <!-- Tailwind + Font Awesome + Google Fonts + Chart.js -->
+  <!-- Tailwind + Font Awesome + Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -15,15 +15,11 @@
     * { font-family: 'Inter', sans-serif; }
     body { background: #f0f2f5; }
     .sidebar { transition: transform 0.3s ease; }
-    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1); }
     .meal-card { background: #1e293b; border-radius: 1rem; color: #f1f5f9; transition: all 0.2s; }
     .meal-card:hover { background: #334155; }
     .status-active { background: #22c55e20; color: #15803d; border-left: 4px solid #22c55e; }
     .status-discharged { background: #ef444420; color: #b91c1c; border-left: 4px solid #ef4444; }
-    .glass-effect { background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
     .table-wrapper { overflow-x: auto; border-radius: 1rem; }
   </style>
 </head>
@@ -40,14 +36,15 @@
       <form id="loginForm">
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-semibold mb-1">Email ID</label>
-          <input type="email" id="loginEmail" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="user@phckareli.com" required>
+          <input type="email" id="loginEmail" class="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="admin@phckareli.com" required>
         </div>
         <div class="mb-6">
           <label class="block text-gray-700 text-sm font-semibold mb-1">Password</label>
-          <input type="password" id="loginPassword" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" required>
+          <input type="password" id="loginPassword" class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
         </div>
         <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 rounded-lg transition"><i class="fas fa-sign-in-alt mr-2"></i>Login</button>
       </form>
+      <p class="text-xs text-center text-gray-400 mt-4">Demo: admin@phckareli.com / जो पासवर्ड Firebase Authentication में सेट किया है वही डालें</p>
     </div>
   </div>
 
@@ -75,7 +72,6 @@
       <!-- Main Content -->
       <main class="flex-1 overflow-y-auto bg-slate-50">
         <div class="p-6">
-          <!-- Dashboard View -->
           <div id="dashboardView" class="view">
             <div class="mb-6"><h1 class="text-3xl font-bold text-slate-800">Dashboard</h1><p class="text-slate-500">Real-time overview</p></div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -92,7 +88,6 @@
             </div>
           </div>
 
-          <!-- Patients Register View -->
           <div id="patientsView" class="view hidden">
             <div class="flex flex-wrap justify-between items-center mb-5 gap-3">
               <h2 class="text-2xl font-bold">Patient Registry</h2>
@@ -113,7 +108,6 @@
             </div>
           </div>
 
-          <!-- Reports View -->
           <div id="reportsView" class="view hidden">
             <h2 class="text-2xl font-bold mb-4">Reports & Export (Admin Privileges)</h2>
             <div class="flex flex-wrap gap-3 mb-6">
@@ -163,13 +157,11 @@
     </div>
   </div>
 
-  <!-- Firebase JavaScript SDK (v10) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, getDocs, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDoc, Timestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 🔒 आपकी असली Firebase Keys यहाँ सेट कर दी गई हैं
     const firebaseConfig = {
       apiKey: "AIzaSyBhBwoGZtGIqF4M9TQL7EqS10UTm6M67so",
       authDomain: "phckareli.firebaseapp.com",
@@ -189,11 +181,10 @@
     const loginForm = document.getElementById('loginForm');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    let currentView = 'dashboard';
-    let currentUserRole = 'staff'; 
+    let currentUserRole = 'staff';
 
     function checkUserRole(email) {
-      if(email.toLowerCase().includes('admin')) {
+      if(email && email.toLowerCase().includes('admin')) {
         currentUserRole = 'admin';
         document.getElementById('navReports').classList.remove('hidden');
         document.getElementById('currentRoleDisplay').innerText = "Role: Admin";
@@ -213,7 +204,6 @@
       }
       document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
       document.getElementById(`${view}View`).classList.remove('hidden');
-      currentView = view;
       if(view === 'dashboard') refreshDashboard();
       if(view === 'patients') fetchPatientsList();
     }
@@ -226,32 +216,26 @@
         const totalLunch = patients.reduce((s,p)=> s + (p.lunchCount||0),0);
         const totalDinner = patients.reduce((s,p)=> s + (p.dinnerCount||0),0);
         const totalAmt = patients.reduce((s,p)=> s + (p.totalAmount||0),0);
-        
         document.getElementById('totalPatients').innerText = patients.length;
         document.getElementById('activeAdmissions').innerText = active.length;
         document.getElementById('totalLunchCount').innerText = totalLunch;
         document.getElementById('totalDinnerCount').innerText = totalDinner;
         document.getElementById('totalAmount').innerText = totalAmt;
-        
         const messMap = {};
         patients.forEach(p => { if(p.messName) messMap[p.messName] = (messMap[p.messName]||0)+1; });
         document.getElementById('messStats').innerHTML = Object.entries(messMap).map(([m,c]) => `<div><span class="font-medium">${m}</span>: ${c}</div>`).join('') || '<div>—</div>';
-        
         const last7 = [...Array(7)].map((_,i) => new Date(Date.now() - i*86400000).toISOString().slice(0,10)).reverse();
         const trendCounts = last7.map(d => patients.filter(p => p.admissionDateTime?.slice(0,10) === d).length);
         const trendCtx = document.getElementById('admissionTrendChart').getContext('2d');
         if(window.trendChart) window.trendChart.destroy();
         window.trendChart = new Chart(trendCtx, { type:'line', data:{ labels:last7, datasets:[{ label:'Admissions', data:trendCounts, borderColor:'#10b981' }] } });
-        
         const monthlyMap = {};
         patients.forEach(p => { if(p.admissionDateTime) { let m = p.admissionDateTime.slice(0,7); monthlyMap[m] = (monthlyMap[m]||0)+(p.totalAmount||0); } });
         const monthsSorted = Object.keys(monthlyMap).sort();
         const expCtx = document.getElementById('monthlyExpenseChart').getContext('2d');
         if(window.expChart) window.expChart.destroy();
         window.expChart = new Chart(expCtx, { type:'bar', data:{ labels:monthsSorted, datasets:[{ label:'Monthly Expense (₹)', data:monthsSorted.map(m=>monthlyMap[m]), backgroundColor:'#f97316' }] } });
-      } catch (e) {
-        console.log("डेटाबेस अभी खाली है या रूल्स सेट नहीं हैं:", e);
-      }
+      } catch(e) { console.error("Dashboard error:", e); }
     }
 
     async function fetchPatientsList() {
@@ -260,7 +244,7 @@
         let patients = snap.docs.map(d => ({id: d.id, ...d.data()}));
         applyFiltersAndRender(patients);
         populateMessFilter(patients);
-      }, (err) => { console.log("डेटा लोड एरर:", err); });
+      }, (err) => console.error("Snapshot error:", err));
     }
 
     function applyFiltersAndRender(patients) {
@@ -269,7 +253,6 @@
       const ipd = document.getElementById('searchIpd')?.value || '';
       const mess = document.getElementById('filterMess')?.value || '';
       const statusF = document.getElementById('filterStatus')?.value || '';
-      
       const filtered = patients.filter(p => 
         (p.patientName?.toLowerCase().includes(name)) && (p.mobile?.includes(mobile)) && (p.ipdNumber?.includes(ipd)) &&
         (!mess || p.messName === mess) && (!statusF || p.status === statusF)
@@ -280,11 +263,10 @@
     function renderPatientTable(patients) {
       const tbody = document.getElementById('patientsTableBody');
       const showEditDelete = currentUserRole === 'admin' ? '' : 'hidden';
-
       tbody.innerHTML = patients.map(p => `
         <tr class="border-b hover:bg-gray-50">
           <td class="p-2">${p.ipdNumber||''}</td><td class="p-2">${p.patientName||''}</td><td class="p-2">${p.mobile||''}</td>
-          <td class="p-2">${p.messName||''}</td><td class="p-2">${p.admissionDateTime?.replace('T',' ')||''}</td><td class="p-2">${p.dischargeDateTime?.replace('T',' ')||'—'}</td>
+          <td class="p-2">${p.messName||''}</td><td class="p-2">${(p.admissionDateTime||'').replace('T',' ')}</td><td class="p-2">${(p.dischargeDateTime||'—').replace('T',' ')}</td>
           <td class="p-2">${p.lunchCount||0}</td><td class="p-2">${p.dinnerCount||0}</td><td class="p-2">₹${p.totalAmount||0}</td>
           <td class="p-2"><span class="px-2 py-1 rounded-full text-xs ${p.status==='Active'?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}">${p.status||'Active'}</span></td>
           <td class="p-2">
@@ -293,9 +275,7 @@
             <button class="deletePatientBtn text-red-600 ${showEditDelete}" data-id="${p.id}" title="Delete"><i class="fas fa-trash"></i></button>
           </td>
         </tr>`).join('');
-      
       document.querySelectorAll('.viewPatientBtn').forEach(btn => btn.addEventListener('click', () => showPatientProfile(btn.dataset.id)));
-      
       if(currentUserRole === 'admin') {
         document.querySelectorAll('.editPatientBtn').forEach(btn => btn.addEventListener('click', () => editPatient(btn.dataset.id)));
         document.querySelectorAll('.deletePatientBtn').forEach(btn => btn.addEventListener('click', async () => { 
@@ -322,7 +302,6 @@
         document.getElementById('admissionDateTime').value = p.admissionDateTime || '';
         document.getElementById('dischargeDateTime').value = p.dischargeDateTime || '';
         document.getElementById('remark').value = p.remark || '';
-        
         document.getElementById('modalTitle').innerText = "Edit Patient Details";
         document.getElementById('patientModal').classList.remove('hidden');
       }
@@ -341,7 +320,6 @@
       const minutes = Math.floor((diffMs%3600000)/60000);
       const mealsReceived = meals.filter(m => m.delivered).length;
       const bill = patient.totalAmount||0;
-      
       const mealCardsHtml = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
           ${['Morning Tea & Biscuits','Breakfast','Lunch','Evening Tea & Biscuits','Dinner'].map((meal,i) => {
@@ -354,12 +332,10 @@
             <button class="saveMealBtn mt-2 bg-emerald-600 text-white text-xs py-1 px-2 rounded" data-meal="${meal}" data-patient="${patientId}">Save Meal</button></div>`;
           }).join('')}
         </div>`;
-        
       document.getElementById('profileContent').innerHTML = `
         <div class="border-b pb-3"><h2 class="text-2xl font-bold">${patient.patientName} (IPD:${patient.ipdNumber})</h2><p>Mess: ${patient.messName} | Status: ${patient.status}</p>
         <p>Admission: ${patient.admissionDateTime?.replace('T',' ')} | Duration: ${days}d ${hours}h ${minutes}m</p><p>Total meals taken: ${mealsReceived} | Total Bill: ₹${bill}</p><hr class="my-3"></div>
-        <div><h3 class="text-xl font-semibold">Daily Meal Updates (Today/Recent)</h3>${mealCardsHtml}<h3 class="font-bold mt-5">Meal History</h3><table class="w-full text-sm mt-2"><thead class="bg-gray-100"><tr><th class="p-2 border text-left">Date</th><th class="p-2 border text-left">Meal</th><th class="p-2 border text-left">Delivered</th></tr></thead><tbody>${meals.map(m=>`<tr><td class="p-2 border">${m.date}</td><td class="p-2 border">${m.mealName}</td><td class="p-2 border">${m.delivered?'✅ Yes':'❌ No'}</td></tr>`).join('')}</tbody></table></div>`;
-      
+        <div><h3 class="text-xl font-semibold">Daily Meal Updates (Today/Recent)</h3>${mealCardsHtml}<h3 class="font-bold mt-5">Meal History</h3><table class="w-full text-sm mt-2"><thead class="bg-gray-100"><tr><th class="p-2 border">Date</th><th class="p-2 border">Meal</th><th class="p-2 border">Delivered</th></tr></thead><tbody>${meals.map(m=>`<tr><td class="p-2 border">${m.date}</td><td class="p-2 border">${m.mealName}</td><td class="p-2 border">${m.delivered?'✅ Yes':'❌ No'}</td></tr>`).join('')}</tbody></table></div>`;
       attachMealSaveEvents(patientId);
       document.getElementById('profileModal').classList.remove('hidden');
     }
@@ -375,12 +351,10 @@
           const timeReceived = card.querySelector('.meal-time').value;
           const remark = card.querySelector('.meal-remark').value;
           const todayDate = new Date().toISOString().slice(0,10);
-          
           const existingQuery = await getDocs(query(collection(db,'mealEntries'), where('patientId','==',patientId), where('mealName','==',mealName), where('date','==',todayDate)));
           let mealRef;
           if(!existingQuery.empty) mealRef = doc(db,'mealEntries', existingQuery.docs[0].id);
           else mealRef = await addDoc(collection(db,'mealEntries'), {patientId, mealName, date: todayDate, createdAt: Timestamp.now()});
-          
           await updateDoc(mealRef, { delivered, foodItem, quantity, timeReceived, remark, updatedAt: Timestamp.now() });
           await recalcPatientMealStats(patientId);
           alert('भोजन का रिकॉर्ड सुरक्षित हुआ!');
@@ -403,69 +377,94 @@
       if (select) select.innerHTML = '<option value="">All Mess</option>' + [...messSet].map(m=>`<option>${m}</option>`).join('');
     }
 
+    // ✅ FIXED: Patient Registration with proper validation and error handling
+    document.getElementById('patientForm')?.addEventListener('submit', async(e) => {
+      e.preventDefault();
+      try {
+        // Collect and validate required fields
+        const ipd = document.getElementById('ipdNumber').value.trim();
+        const patientName = document.getElementById('patientName').value.trim();
+        const mobile = document.getElementById('mobile').value.trim();
+        const messName = document.getElementById('messName').value.trim();
+        let admissionDateTime = document.getElementById('admissionDateTime').value;
+        
+        if (!ipd || !patientName || !mobile || !messName) {
+          alert("कृपया सभी आवश्यक फील्ड भरें: IPD, Patient Name, Mobile, Mess Name");
+          return;
+        }
+        if (!admissionDateTime) {
+          // set current datetime if empty
+          const now = new Date();
+          admissionDateTime = now.toISOString().slice(0,16);
+          document.getElementById('admissionDateTime').value = admissionDateTime;
+        }
+        
+        const dischargeDateTime = document.getElementById('dischargeDateTime').value || null;
+        const status = (dischargeDateTime && new Date(dischargeDateTime) < new Date()) ? 'Discharged' : 'Active';
+        
+        const pData = {
+          ipdNumber: ipd,
+          patientName: patientName,
+          mobile: mobile,
+          messName: messName,
+          admissionDateTime: admissionDateTime,
+          dischargeDateTime: dischargeDateTime,
+          careOf: document.getElementById('careOf').value,
+          address: document.getElementById('address').value,
+          wardBed: document.getElementById('wardBed').value,
+          remark: document.getElementById('remark').value,
+          status: status
+        };
+        
+        const editId = document.getElementById('editPatientId').value;
+        if (editId) {
+          if (currentUserRole !== 'admin') {
+            alert('जानकारी बदलने का अधिकार केवल एडमिन को है!');
+            return;
+          }
+          await updateDoc(doc(db, 'patients', editId), pData);
+          alert('मरीज की जानकारी अपडेट हो गई!');
+        } else {
+          pData.lunchCount = 0;
+          pData.dinnerCount = 0;
+          pData.totalAmount = 0;
+          await addDoc(collection(db, 'patients'), pData);
+          alert('नया मरीज पंजीकृत हो गया!');
+        }
+        
+        // Reset form and close modal
+        document.getElementById('patientForm').reset();
+        document.getElementById('editPatientId').value = '';
+        document.getElementById('patientModal').classList.add('hidden');
+        
+        // Refresh data
+        fetchPatientsList();
+        refreshDashboard();
+      } catch (error) {
+        console.error("Registration Error:", error);
+        alert("डेटा सेव करते समय त्रुटि हुई: " + (error.message || "कृपया कंसोल देखें"));
+      }
+    });
+
     document.getElementById('exportExcelBtn')?.addEventListener('click', async () => {
       if(currentUserRole !== 'admin') return;
       const snap = await getDocs(collection(db,'patients'));
-      const data = snap.docs.map(d=> {
-        const p = d.data();
-        return { IPD_No: p.ipdNumber, Name: p.patientName, Mobile: p.mobile, Mess: p.messName, Admission: p.admissionDateTime, Discharge: p.dischargeDateTime||'—', Lunch: p.lunchCount||0, Dinner: p.dinnerCount||0, Total_Amount: p.totalAmount||0, Status: p.status };
-      });
+      const data = snap.docs.map(d=> { const p=d.data(); return { IPD_No: p.ipdNumber, Name: p.patientName, Mobile: p.mobile, Mess: p.messName, Admission: p.admissionDateTime, Discharge: p.dischargeDateTime||'—', Lunch: p.lunchCount||0, Dinner: p.dinnerCount||0, Total_Amount: p.totalAmount||0, Status: p.status }; });
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Patients'); XLSX.writeFile(wb,'PHC_Mess_Report.xlsx');
     });
     
-    document.getElementById('exportPdfReportBtn')?.addEventListener('click', () => { 
-      if(currentUserRole !== 'admin') return;
-      html2pdf().from(document.getElementById('reportContainer')).save('PHC_Monthly_Report.pdf'); 
-    });
+    document.getElementById('exportPdfReportBtn')?.addEventListener('click', () => { if(currentUserRole === 'admin') html2pdf().from(document.getElementById('reportContainer')).save('PHC_Monthly_Report.pdf'); });
     
     document.getElementById('generateMonthlyReportBtn')?.addEventListener('click', async() => {
       if(currentUserRole !== 'admin') return;
       const month = document.getElementById('reportMonthSelect').value;
       if(!month) { alert('कृपया महीना चुनें!'); return; }
       const patientsSnap = await getDocs(collection(db,'patients'));
-      let reportHtml = `<h3 class="text-xl font-bold mb-3 text-center">Monthly Mess Summary (${month})</h3><table class="w-full border collapse border-gray-300 text-sm"><thead class="bg-gray-100"><tr><th class="border p-2">Patient</th><th class="border p-2">Mess</th><th class="border p-2">Lunch</th><th class="border p-2">Dinner</th><th class="border p-2">Amount (₹)</th></tr></thead><tbody>`;
-      patientsSnap.docs.forEach(d=>{ 
-        const p=d.data(); 
-        if(p.admissionDateTime && p.admissionDateTime.startsWith(month)) {
-          reportHtml+=`<tr><td class="border p-2">${p.patientName}</td><td class="border p-2">${p.messName}</td><td class="border p-2 text-center">${p.lunchCount||0}</td><td class="border p-2 text-center">${p.dinnerCount||0}</td><td class="border p-2 text-right">₹${p.totalAmount||0}</td></tr>`; 
-        }
-      });
+      let reportHtml = `<h3 class="text-xl font-bold mb-3 text-center">Monthly Mess Summary (${month})</h3><table class="w-full border"><thead class="bg-gray-100"><tr><th class="border p-2">Patient</th><th class="border p-2">Mess</th><th class="border p-2">Lunch</th><th class="border p-2">Dinner</th><th class="border p-2">Amount (₹)</th></tr></thead><tbody>`;
+      patientsSnap.docs.forEach(d=>{ const p=d.data(); if(p.admissionDateTime && p.admissionDateTime.startsWith(month)) reportHtml+=`<tr><td class="border p-2">${p.patientName}</td><td class="border p-2">${p.messName}</td><td class="border p-2 text-center">${p.lunchCount||0}</td><td class="border p-2 text-center">${p.dinnerCount||0}</td><td class="border p-2 text-right">₹${p.totalAmount||0}</td></tr>`; });
       reportHtml+=`</tbody></table>`;
       document.getElementById('reportContainer').innerHTML = reportHtml;
-    });
-
-    document.getElementById('patientForm')?.addEventListener('submit', async(e) => {
-      e.preventDefault();
-      const id = document.getElementById('editPatientId').value;
-      const ipd = document.getElementById('ipdNumber').value;
-      const patientName = document.getElementById('patientName').value;
-      const mobile = document.getElementById('mobile').value;
-      const messName = document.getElementById('messName').value;
-      const admissionDateTime = document.getElementById('admissionDateTime').value;
-      const dischargeDateTime = document.getElementById('dischargeDateTime').value;
-      const status = dischargeDateTime && new Date(dischargeDateTime) < new Date() ? 'Discharged' : 'Active';
-      
-      const pData = {
-        ipdNumber: ipd, patientName, mobile, messName, admissionDateTime, dischargeDateTime: dischargeDateTime||null,
-        careOf: document.getElementById('careOf').value, address: document.getElementById('address').value, wardBed: document.getElementById('wardBed').value,
-        remark: document.getElementById('remark').value, status
-      };
-
-      if(id) {
-        if(currentUserRole !== 'admin') { alert('जानकारी बदलने का अधिकार केवल एडमिन को है!'); return; }
-        await updateDoc(doc(db, 'patients', id), pData);
-        alert('मरीज की जानकारी अपडेट हो गई!');
-      } else {
-        pData.lunchCount = 0; pData.dinnerCount = 0; pData.totalAmount = 0;
-        await addDoc(collection(db,'patients'), pData);
-        alert('नया मरीज पंजीकृत हो गया!');
-      }
-      
-      document.getElementById('patientModal').classList.add('hidden');
-      document.getElementById('patientForm').reset();
-      document.getElementById('editPatientId').value = '';
-      fetchPatientsList(); refreshDashboard();
     });
 
     loginForm.addEventListener('submit', async(e) => {
@@ -475,7 +474,7 @@
       try { 
         await signInWithEmailAndPassword(auth, email, password); 
       } catch(err) { 
-        alert('गलत ईमेल या पासवर्ड! कृपया जांचें कि आपने इसे Firebase में जोड़ा है या नहीं।'); 
+        alert('गलत ईमेल या पासवर्ड! कृपया जांचें कि आपने इसे Firebase Authentication में जोड़ा है या नहीं।'); 
       }
     });
     
@@ -486,8 +485,7 @@
         appContainer.classList.remove('hidden'); 
         showView('dashboard'); 
         setInterval(refreshDashboard, 30000); 
-      }
-      else { 
+      } else { 
         loginContainer.classList.remove('hidden'); 
         appContainer.classList.add('hidden'); 
       }
@@ -503,11 +501,11 @@
     });
     document.getElementById('closeModalBtn')?.addEventListener('click', () => document.getElementById('patientModal').classList.add('hidden'));
     document.getElementById('closeProfileBtn')?.addEventListener('click', () => document.getElementById('profileModal').classList.add('hidden'));
-    document.getElementById('searchName')?.addEventListener('input', fetchPatientsList);
-    document.getElementById('searchMobile')?.addEventListener('input', fetchPatientsList);
-    document.getElementById('searchIpd')?.addEventListener('input', fetchPatientsList);
-    document.getElementById('filterMess')?.addEventListener('change', fetchPatientsList);
-    document.getElementById('filterStatus')?.addEventListener('change', fetchPatientsList);
+    
+    ['searchName','searchMobile','searchIpd','filterMess','filterStatus'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', fetchPatientsList);
+      if(id.includes('filter')) document.getElementById(id)?.addEventListener('change', fetchPatientsList);
+    });
     
     const selectMonth = document.getElementById('reportMonthSelect');
     const currentYear = new Date().getFullYear();
